@@ -1,0 +1,6 @@
+Flask
+PyJWT
+Flask-SQLAlchemy
+SQLAlchemy
+Flask-Migrate
+python-dotenv

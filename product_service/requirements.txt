@@ -1,0 +1,11 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Flask-Migrate
+Werkzeug
+PyJWT
+Flask-Bcrypt
+psycopg2-binary
+Flask-Script
+python-dotenv
+requests

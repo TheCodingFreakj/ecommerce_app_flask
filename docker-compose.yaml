@@ -1,0 +1,60 @@
+version: '3'
+services:
+  user_service:
+    build:
+      context: ./user_service
+    ports:
+      - "5001:5001"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db_user
+
+  product_service:
+    build:
+      context: ./product_service
+    ports:
+      - "5002:5002"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db_user
+
+  order_service:
+    build:
+      context: ./order_service
+    ports:
+      - "5003:5003"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db_user
+
+
+  shared_service:
+    build:
+      context: ./shared_service
+    ports:
+      - "5005:5005"
+    networks:
+      - ecommerce-network
+    depends_on:
+      - db_user
+      - user_service
+      - product_service
+      - order_service
+
+  db_user:
+    build:
+      context: ./user_service
+    environment:
+      POSTGRES_DB: defaultdb
+      POSTGRES_USER: avnadmin
+      POSTGRES_PASSWORD: AVNS_H1pVBFm6Pf6zUCcVquu
+    ports:
+      - "12783:12783"  
+    networks:
+      - ecommerce-network
+networks:
+  ecommerce-network:
+    driver: bridge
