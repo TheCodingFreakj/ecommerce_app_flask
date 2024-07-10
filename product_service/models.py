@@ -6,5 +6,6 @@ class Product(db.Model):
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
+    last_modified_by = db.Column(db.Integer, nullable=False)
     version = db.Column(db.Integer, nullable=False, default=1)  # Version column for optimistic concurrency control
 

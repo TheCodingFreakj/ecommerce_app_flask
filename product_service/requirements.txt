@@ -9,3 +9,5 @@ psycopg2-binary
 Flask-Script
 python-dotenv
 requests
+aiohttp
+asyncio

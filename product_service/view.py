@@ -1,8 +1,11 @@
+import asyncio
 from flask import request, jsonify
 from flask import Blueprint, current_app, request, jsonify, make_response
 import datetime
 from functools import wraps
 import logging
+
+from .client import validate_token
 from .models import Product
 from .models import db
 
@@ -26,54 +29,94 @@ def get_product(product_id):
 
 @product_bp.route('/products', methods=['POST'])
 def create_product():
-    data = request.get_json()
-    try:
-        # Create new product instance
-        new_product = Product(
-            name=data['name'],
-            description=data['description'],
-            price=data['price'],
-            stock=data['stock'],
-            version=1
-        )
+    with current_app.app_context():
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        data = loop.run_until_complete(validate_token(token))
+        validation_response = data
+        logger.info(validation_response)
+        if 'user_id' not in validation_response:
+            return jsonify({'message': 'Token is invalid!'}), 403
+        current_user = validation_response
+        data = request.get_json()
+        try:
+            # Create new product instance
+            new_product = Product(
+                name=data['name'],
+                description=data['description'],
+                price=data['price'],
+                stock=data['stock'],
+                last_modified_by=current_user["user_id"],
+                version=1
+            )
 
-        db.session.add(new_product)
-        db.session.commit()
-        return jsonify(new_product.to_dict()), 201
+            db.session.add(new_product)
+            db.session.commit()
+            return jsonify(new_product.to_dict()), 201
 
-    except IntegrityError as e:
-        db.session.rollback()
-        return jsonify({'error': 'Product with this name already exists. Please use a different name.'}), 409
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        except IntegrityError as e:
+            db.session.rollback()
+            return jsonify({'error': 'Product with this name already exists. Please use a different name.'}), 409
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
 
 
 @product_bp.route('/products/<int:product_id>', methods=['PUT'])
 def update_product(product_id):
-    data = request.get_json()
-    try:
-        product = Product.query.filter_by(
-            id=product_id).with_for_update().first()
-        if not product:
-            return jsonify({'error': 'Product not found'}), 404
 
-        # Check for version conflict
-        if product.version != data['version']:
-            return jsonify({'error': 'Product has been updated by another user. Please refresh and try again.'}), 409
+    with current_app.app_context():
+        token = request.headers.get('Authorization')
+        if not token:
+            return jsonify({'message': 'Token is missing!'}), 403
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        data = loop.run_until_complete(validate_token(token))
+        validation_response = data
+        logger.info(validation_response)
+        if 'user_id' not in validation_response:
+            return jsonify({'message': 'Token is invalid!'}), 403
+        current_user = validation_response
 
-        # Update product information
-        product.name = data['name']
-        product.description = data['description']
-        product.price = data['price']
-        product.stock = data['stock']
-        product.version += 1  # Increment version
+        data = request.get_json()
+        try:
+            product = Product.query.filter_by(
+                id=product_id).with_for_update().first()
+            if not product:
+                return jsonify({'error': 'Product not found'}), 404
 
-        db.session.commit()
-        return jsonify(product.to_dict()), 200
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+            if (current_user["user_id"] == product.last_modified_by):
+                # Update product information
+                product.name = data['name']
+                product.description = data['description']
+                product.price = data['price']
+                product.stock = data['stock']
+                product.version += 1  # Increment version
+                product.last_modified_by = current_user["user_id"]
+
+                db.session.commit()
+                return jsonify(product.to_dict()), 200
+            else:
+                # Check for version conflict
+                if product.version != data['version']:
+                    return jsonify({'error': 'Product has been updated by another user. Please refresh and try again.'}), 409
+                else:
+                    product.name = data['name']
+                    product.description = data['description']
+                    product.price = data['price']
+                    product.stock = data['stock']
+                    product.version += 1  # Increment version
+                    product.last_modified_by = current_user["user_id"]
+
+                    db.session.commit()
+                    return jsonify(product.to_dict()), 200
+
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            return jsonify({'error': str(e)}), 500
 
 
 def to_dict(self):

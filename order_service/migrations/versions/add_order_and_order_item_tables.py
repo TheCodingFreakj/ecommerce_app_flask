@@ -35,6 +35,7 @@ def upgrade():
         sa.Column('price', sa.Numeric(precision=10, scale=2), nullable=False),
         sa.Column('stock', sa.Integer(), nullable=False),
         sa.Column('version', sa.Integer(), nullable=False, default=1),
+        sa.Column('last_modified_by', sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('name')
     )
