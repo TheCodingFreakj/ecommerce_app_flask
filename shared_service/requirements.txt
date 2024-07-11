@@ -6,3 +6,5 @@ Flask-Migrate
 python-dotenv
 psycopg2-binary
 flask_cors
+pytest 
+pytest-flask

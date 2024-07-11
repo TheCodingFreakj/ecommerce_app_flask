@@ -19,7 +19,15 @@ services:
       - ecommerce-network
     depends_on:
       - db_user
-
+  products_test:
+    build: ./product_service
+    command: ["pytest", "--disable-warnings"]
+    environment:
+      - FLASK_ENV=testing
+      - PYTHONPATH=/app
+    depends_on:
+      - product_service
+      
   order_service:
     build:
       context: ./order_service
