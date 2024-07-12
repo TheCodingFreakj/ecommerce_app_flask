@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: shared-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: shared-service
+  template:
+    metadata:
+      labels:
+        app: shared-service
+    spec:
+      containers:
+      - name: shared-service
+        image: pallavi57/shared_service:latest
+        ports:
+        - containerPort: 5005
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: shared-service
+spec:
+  selector:
+    app: shared-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5005
+  type: LoadBalancer
