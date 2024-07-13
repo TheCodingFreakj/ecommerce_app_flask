@@ -9,7 +9,14 @@ services:
       - ecommerce-network
     depends_on:
       - db_user
-
+  users_test:
+    build: ./user_service
+    command: sh -c "pytest && tail -f /dev/null"
+    environment:
+      - FLASK_ENV=testing
+      - PYTHONPATH=/app
+    depends_on:
+      - user_service
   product_service:
     build:
       context: ./product_service
@@ -21,7 +28,7 @@ services:
       - db_user
   products_test:
     build: ./product_service
-    command: ["pytest", "--disable-warnings"]
+    command: sh -c "pytest && tail -f /dev/null"
     environment:
       - FLASK_ENV=testing
       - PYTHONPATH=/app
@@ -37,6 +44,15 @@ services:
       - ecommerce-network
     depends_on:
       - db_user
+
+  orders_test:
+    build: ./order_service
+    command: sh -c "pytest && tail -f /dev/null"
+    environment:
+      - FLASK_ENV=testing
+      - PYTHONPATH=/app
+    depends_on:
+      - order_service
 
 
   shared_service:

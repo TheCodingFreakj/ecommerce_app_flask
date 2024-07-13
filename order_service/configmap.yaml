@@ -1,0 +1,11 @@
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  FLASK_APP: app.py
+  FLASK_ENV: production
+  SECRET_KEY: secret-key
+  DATABASE_URL: postgresql://avnadmin:AVNS_H1pVBFm6Pf6zUCcVquu@pg-2a73f17c-pallavidapriya75-97f0.g.aivencloud.com:12783/defaultdb
+  SHARED_SERVICES: http://shared-service.default.svc.cluster.local:5005/validate_token

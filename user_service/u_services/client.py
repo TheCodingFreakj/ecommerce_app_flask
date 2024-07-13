@@ -14,10 +14,8 @@ async def fetch_data(session, url,token):
 
 async def validate_token(token):
     async with aiohttp.ClientSession() as session:
-        
         try:
-            data = await fetch_data(session,os.getenv('SHARED_SERVICES') ,token)
-            await asyncio.sleep(1)
+            data = await fetch_data(session, os.getenv('SHARED_SERVICES'),token)
             return data
         except aiohttp.ClientConnectionError as ce:
             return {'error': 'Connection error occurred', 'details': str(ce)}

@@ -1,7 +1,7 @@
 from contextlib import contextmanager
 import threading
 
-# Define a lock for each product (simplified)
+# Define a lock for each product
 product_locks = {}
 
 class LockException(Exception):

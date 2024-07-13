@@ -1,5 +1,5 @@
 
-from . import create_app
+from o_services import create_app
 
 
 app = create_app()

@@ -1,0 +1,48 @@
+step1: start minikube
+minikube start --nodes 3
+step2: check the node
+kubectl get nodes
+step3: Deploy the resources to the nodes
+kubectl apply -f shared_services.yaml
+kubectl apply -f order_services.yaml
+kubectl apply -f product_services.yaml
+kubectl apply -f user_services.yaml
+step4:check pods
+kubectl get pods
+kubectl describe <pod_name>
+step5:configure the port forward 
+
+kubectl port-forward service/user-service 5001:80
+kubectl port-forward service/user-service 5002:80
+kubectl port-forward service/user-service 5003:80
+
+
+For localset----> docker-compose build and docker-compose up could be run for seeing in local and running the unit test cases
+
+
+
+
+## Postman Collection
+
+This repository includes a Postman collection for testing the API.
+
+### Importing the Collection
+
+1. Download the [ecommer_app.postman_collection.json]
+2. Open Postman.
+3. Go to the Collections tab.
+4. Click on the `Import` button.
+5. Select the downloaded `ecommer_app.postman_collection.json` file.
+6. The collection will be imported and available in Postman.
+
+### Example Usage
+
+You can use the imported collection to test the API endpoints provided in this project. The collection includes requests for:
+- Register a new user
+- Login the user1 and user2
+- Creating the product as user1 and user2
+- Create order
+- View Order
+- Update products as user1 and user2
+
+Each request is pre-configured with example parameters and headers. Feel free to modify them as needed.

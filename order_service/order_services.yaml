@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: product-service
+  name: order-service
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: product-service
+      app: order-service
   template:
     metadata:
       labels:
-        app: product-service
+        app: order-service
     spec:
       containers:
-      - name: product-service
-        image: pallavi57/product_service-v2:latest
+      - name: order-service
+        image: pallavi57/order-service-v2:latest
         env:
         - name: FLASK_APP
           valueFrom:
@@ -47,12 +47,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: product-service
+  name: order-service
 spec:
   selector:
-    app: product-service
+    app: order-service
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 5002
+      targetPort: 5003
   type: LoadBalancer
